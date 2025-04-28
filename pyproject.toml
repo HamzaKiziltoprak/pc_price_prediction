@@ -21,4 +21,4 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/canbula/boracanbula"
+Homepage = "https://github.com/HamzaKiziltoprak/pc_price_prediction"
