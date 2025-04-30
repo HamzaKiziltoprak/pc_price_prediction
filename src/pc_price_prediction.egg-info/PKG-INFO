@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: pc_price_prediction
+Version: 0.0.1
+Summary: A simple package for calculating statistics.
+Author-email: Hamza Kiziltoprak <kiziltoprakh55@gmail.com>
+Project-URL: Homepage, https://github.com/HamzaKiziltoprak/pc_price_prediction
+Keywords: Hamza,pc_price_prediction
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Dynamic: license-file
