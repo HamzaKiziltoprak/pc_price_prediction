@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💻 Laptop Fiyat Tahmini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .predict-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+
+        .price-result {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .price-result h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .price-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .suggestions {
+            margin-top: 20px;
+        }
+
+        .suggestion-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .suggestion-specs {
+            font-size: 0.9rem;
+            color: #666;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .suggestion-specs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-text {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💻 Laptop Fiyat Tahmini</h1>
+            <p>Laptop özelliklerini girin, anlık fiyat tahmini ve öneriler alın!</p>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2>🔧 Laptop Özellikleri</h2>
+                <div class="info-text">
+                    <strong>💡 İpucu:</strong> Boş bıraktığınız alanlar varsayılan değerlerle doldurulacak. Sadece bildiğiniz özellikleri girin!
+                </div>
+                
+                <form id="laptopForm">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label for="brand">Marka</label>
+                                <select id="brand" name="brand">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Acer">Acer</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Asus">Asus</option>
+                                    <option value="AXL">AXL</option>
+                                    <option value="Avita">Avita</option>
+                                    <option value="Chuwi">Chuwi</option>
+                                    <option value="Dell">Dell</option>
+                                    <option value="Fujitsu">Fujitsu</option>
+                                    <option value="Gigabyte">Gigabyte</option>
+                                    <option value="Honor">Honor</option>
+                                    <option value="HP">HP</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="iBall">iBall</option>
+                                    <option value="Infinix">Infinix</option>
+                                    <option value="Lenovo">Lenovo</option>
+                                    <option value="LG">LG</option>
+                                    <option value="Microsoft">Microsoft</option>
+                                    <option value="MSI">MSI</option>
+                                    <option value="Ninkear">Ninkear</option>
+                                    <option value="Primebook">Primebook</option>
+                                    <option value="Razer">Razer</option>
+                                    <option value="Realme">Realme</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Tecno">Tecno</option>
+                                    <option value="Ultimus">Ultimus</option>
+                                    <option value="Vaio">Vaio</option>
+                                    <option value="Walker">Walker</option>
+                                    <option value="Wings">Wings</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="Zebronics">Zebronics</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="spec_rating">Değerlendirme (60-89)</label>
+                                <input type="number" id="spec_rating" name="spec_rating" min="60" max="89" step="0.1" placeholder="70.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row-single">
+                            <div>
+                                <label for="processor">İşlemci</label>
+                                <select id="processor" name="processor">
+                                    <option value="">Seçiniz</option>
+                                    <option value="3rd Gen AMD Athlon 3050U">AMD Athlon 3050U</option>
+                                    <option value="3rd Gen AMD Athlon Silver 3050U">AMD Athlon Silver 3050U</option>
+                                    <option value="AMD Athlon 7120U">AMD Athlon 7120U</option>
+                                    <option value="AMD Athlon Pro 3045B">AMD Athlon Pro 3045B</option>
+                                    <option value="3rd Gen AMD Ryzen 3 3250U">AMD Ryzen 3 3250U</option>
+                                    <option value="3rd Gen AMD Ryzen 3 3500U">AMD Ryzen 3 3500U</option>
+                                    <option value="AMD Ryzen 3 5300U">AMD Ryzen 3 5300U</option>
+                                    <option value="AMD Ryzen 3 5425U">AMD Ryzen 3 5425U</option>
+                                    <option value="7th Gen AMD Ryzen 3 7320U">AMD Ryzen 3 7320U</option>
+                                    <option value="7th Gen AMD Ryzen 3 7330U">AMD Ryzen 3 7330U</option>
+                                    <option value="3rd Gen AMD Ryzen 5 3500U">AMD Ryzen 5 3500U</option>
+                                    <option value="3rd Gen AMD Ryzen 5 3580U">AMD Ryzen 5 3580U</option>
+                                    <option value="5th Gen AMD Ryzen 5 5500U">AMD Ryzen 5 5500U</option>
+                                    <option value="5th Gen AMD Ryzen 5 5600H">AMD Ryzen 5 5600H</option>
+                                    <option value="5th Gen AMD Ryzen 5 5600HS">AMD Ryzen 5 5600HS</option>
+                                    <option value="5th Gen AMD Ryzen 5 5625U">AMD Ryzen 5 5625U</option>
+                                    <option value="6th Gen AMD Ryzen 5 6600H">AMD Ryzen 5 6600H</option>
+                                    <option value="7th Gen AMD Ryzen 5 7520U">AMD Ryzen 5 7520U</option>
+                                    <option value="7th Gen AMD Ryzen 5 7530U">AMD Ryzen 5 7530U</option>
+                                    <option value="7th Gen AMD Ryzen 5 7535HS">AMD Ryzen 5 7535HS</option>
+                                    <option value="5th Gen AMD Ryzen 7 5700U">AMD Ryzen 7 5700U</option>
+                                    <option value="5th Gen AMD Ryzen 7 5800H">AMD Ryzen 7 5800H</option>
+                                    <option value="5th Gen AMD Ryzen 7 5800HS">AMD Ryzen 7 5800HS</option>
+                                    <option value="5th Gen AMD Ryzen 7 5825U">AMD Ryzen 7 5825U</option>
+                                    <option value="6th Gen AMD Ryzen 7 6800H">AMD Ryzen 7 6800H</option>
+                                    <option value="6th Gen AMD Ryzen 7 6800HS">AMD Ryzen 7 6800HS</option>
+                                    <option value="7th Gen AMD Ryzen 7 7730U">AMD Ryzen 7 7730U</option>
+                                    <option value="7th Gen AMD Ryzen 7 7735HS">AMD Ryzen 7 7735HS</option>
+                                    <option value="7th Gen AMD Ryzen 7 7735U">AMD Ryzen 7 7735U</option>
+                                    <option value="7th Gen AMD Ryzen 7 7840HS">AMD Ryzen 7 7840HS</option>
+                                    <option value="7th Gen AMD Ryzen 7 7940HS">AMD Ryzen 7 7940HS</option>
+                                    <option value="AMD Ryzen 9 6900HX">AMD Ryzen 9 6900HX</option>
+                                    <option value="7th Gen AMD Ryzen 9 7940HS">AMD Ryzen 9 7940HS</option>
+                                    <option value="7th Gen AMD Ryzen 9 7945HX">AMD Ryzen 9 7945HX</option>
+                                    <option value="Apple M1">Apple M1</option>
+                                    <option value="Apple M2">Apple M2</option>
+                                    <option value="Apple M2 Pro">Apple M2 Pro</option>
+                                    <option value="Apple M2 Max">Apple M2 Max</option>
+                                    <option value="Intel Celeron N4020">Intel Celeron N4020</option>
+                                    <option value="Intel Celeron N4500">Intel Celeron N4500</option>
+                                    <option value="Intel Pentium Silver N6000">Intel Pentium Silver N6000</option>
+                                    <option value="Intel Core i3 N305">Intel Core i3 N305</option>
+                                    <option value="10th Gen Intel Core i3 1005G1">Intel Core i3 1005G1</option>
+                                    <option value="11th Gen Intel Core i3 1115G4">Intel Core i3 1115G4</option>
+                                    <option value="12th Gen Intel Core i3 1215U">Intel Core i3 1215U</option>
+                                    <option value="12th Gen Intel Core i3 1220P">Intel Core i3 1220P</option>
+                                    <option value="13th Gen Intel Core i3 1305U">Intel Core i3 1305U</option>
+                                    <option value="13th Gen Intel Core i3 1315U">Intel Core i3 1315U</option>
+                                    <option value="10th Gen Intel Core i5 1035G1">Intel Core i5 1035G1</option>
+                                    <option value="10th Gen Intel Core i5 1035G4">Intel Core i5 1035G4</option>
+                                    <option value="11th Gen Intel Core i5 1135G7">Intel Core i5 1135G7</option>
+                                    <option value="11th Gen Intel Core i5 1155G7">Intel Core i5 1155G7</option>
+                                    <option value="12th Gen Intel Core i5 1235U">Intel Core i5 1235U</option>
+                                    <option value="12th Gen Intel Core i5 1240P">Intel Core i5 1240P</option>
+                                    <option value="12th Gen Intel Core i5 12450H">Intel Core i5 12450H</option>
+                                    <option value="12th Gen Intel Core i5 12500H">Intel Core i5 12500H</option>
+                                    <option value="13th Gen Intel Core i5 1335U">Intel Core i5 1335U</option>
+                                    <option value="13th Gen Intel Core i5 1340P">Intel Core i5 1340P</option>
+                                    <option value="13th Gen Intel Core i5 13420H">Intel Core i5 13420H</option>
+                                    <option value="13th Gen Intel Core i5 13500H">Intel Core i5 13500H</option>
+                                    <option value="13th Gen Intel Core i5 13500HX">Intel Core i5 13500HX</option>
+                                    <option value="11th Gen Intel Core i7 1165G7">Intel Core i7 1165G7</option>
+                                    <option value="11th Gen Intel Core i7 1185G7">Intel Core i7 1185G7</option>
+                                    <option value="11th Gen Intel Core i7 1195G7">Intel Core i7 1195G7</option>
+                                    <option value="12th Gen Intel Core i7 1255U">Intel Core i7 1255U</option>
+                                    <option value="12th Gen Intel Core i7 1260P">Intel Core i7 1260P</option>
+                                    <option value="13th Gen Intel Core i7 1355U">Intel Core i7 1355U</option>
+                                    <option value="13th Gen Intel Core i7 1360P">Intel Core i7 1360P</option>
+                                    <option value="12th Gen Intel Core i7 12650H">Intel Core i7 12650H</option>
+                                    <option value="12th Gen Intel Core i7 12700H">Intel Core i7 12700H</option>
+                                    <option value="13th Gen Intel Core i7 13620H">Intel Core i7 13620H</option>
+                                    <option value="13th Gen Intel Core i7 13650HX">Intel Core i7 13650HX</option>
+                                    <option value="13th Gen Intel Core i7 13700H">Intel Core i7 13700H</option>
+                                    <option value="13th Gen Intel Core i7 13700HX">Intel Core i7 13700HX</option>
+                                    <option value="13th Gen Intel Core i9 13900H">Intel Core i9 13900H</option>
+                                    <option value="13th Gen Intel Core i9 13900HX">Intel Core i9 13900HX</option>
+                                    <option value="13th Gen Intel Core i9 13980HX">Intel Core i9 13980HX</option>
+                                    <option value="MediaTek MTK8788">MediaTek MTK8788</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label for="CPU">CPU Çekirdek</label>
+                                <select id="CPU" name="CPU">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Dual Core, 2 Threads">Dual Core, 2 Threads</option>
+                                    <option value="Dual Core, 4 Threads">Dual Core, 4 Threads</option>
+                                    <option value="Quad Core, 4 Threads">Quad Core, 4 Threads</option>
+                                    <option value="Quad Core, 8 Threads">Quad Core, 8 Threads</option>
+                                    <option value="Hexa Core, 12 Threads">Hexa Core, 12 Threads</option>
+                                    <option value="Octa Core, 8 Threads">Octa Core, 8 Threads</option>
+                                    <option value="Octa Core, 16 Threads">Octa Core, 16 Threads</option>
+                                    <option value="Octa Core (4P + 4E)">Octa Core (4P + 4E)</option>
+                                    <option value="5 Cores (1P + 4E), 6 Threads">5 Cores (1P + 4E), 6 Threads</option>
+                                    <option value="Hexa Core (2P + 4E), 8 Threads">Hexa Core (2P + 4E), 8 Threads</option>
+                                    <option value="10 Cores (2P + 8E), 12 Threads">10 Cores (2P + 8E), 12 Threads</option>
+                                    <option value="Octa Core (4P + 4E), 12 Threads">Octa Core (4P + 4E), 12 Threads</option>
+                                    <option value="10 Cores (6P + 4E), 16 Threads">10 Cores (6P + 4E), 16 Threads</option>
+                                    <option value="12 Cores (4P + 8E), 16 Threads">12 Cores (4P + 8E), 16 Threads</option>
+                                    <option value="14 Cores (6P + 8E), 20 Threads">14 Cores (6P + 8E), 20 Threads</option>
+                                    <option value="14 Cores (6P + 8E)">14 Cores (6P + 8E)</option>
+                                    <option value="16 Cores (8P + 8E), 24 Threads">16 Cores (8P + 8E), 24 Threads</option>
+                                    <option value="24 Cores (8P + 16E), 32 Threads">24 Cores (8P + 16E), 32 Threads</option>
+                                    <option value="10 Cores, 12 Threads">10 Cores, 12 Threads</option>
+                                    <option value="12 Cores">12 Cores</option>
+                                    <option value="16 Cores, 32 Threads">16 Cores, 32 Threads</option>
+                                    <option value="20 Threads">20 Threads</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="Ram">RAM (GB)</label>
+                                <select id="Ram" name="Ram">
+                                    <option value="">Seçiniz</option>
+                                    <option value="2">2 GB</option>
+                                    <option value="4">4 GB</option>
+                                    <option value="8">8 GB</option>
+                                    <option value="12">12 GB</option>
+                                    <option value="16">16 GB</option>
+                                    <option value="32">32 GB</option>
+                                    <option value="64">64 GB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label for="Ram_type">RAM Tipi</label>
+                                <select id="Ram_type" name="Ram_type">
+                                    <option value="">Seçiniz</option>
+                                    <option value="DDR3">DDR3</option>
+                                    <option value="DDR4">DDR4</option>
+                                    <option value="DDR4-">DDR4-</option>
+                                    <option value="DDR5">DDR5</option>
+                                    <option value="LPDDR4">LPDDR4</option>
+                                    <option value="LPDDR4X">LPDDR4X</option>
+                                    <option value="LPDDR4x">LPDDR4x</option>
+                                    <option value="LPDDR5">LPDDR5</option>
+                                    <option value="LPDDR5X">LPDDR5X</option>
+                                    <option value="LPDDR5x">LPDDR5x</option>
+                                    <option value="Unified">Unified</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="ROM">Depolama (GB)</label>
+                                <select id="ROM" name="ROM">
+                                    <option value="">Seçiniz</option>
+                                    <option value="32">32 GB</option>
+                                    <option value="64">64 GB</option>
+                                    <option value="128">128 GB</option>
+                                    <option value="256">256 GB</option>
+                                    <option value="512">512 GB</option>
+                                    <option value="1024">1 TB (1024 GB)</option>
+                                    <option value="2048">2 TB (2048 GB)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label for="ROM_type">Depolama Tipi</label>
+                                <select id="ROM_type" name="ROM_type">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Hard-Disk">Hard-Disk (HDD)</option>
+                                    <option value="SSD">SSD</option>
+                                    <option value="eMMC">eMMC</option>
+                                    <option value="NVMe SSD">NVMe SSD</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="display_size">Ekran Boyutu (inç)</label>
+                                <select id="display_size" name="display_size">
+                                    <option value="">Seçiniz</option>
+                                    <option value="11.6">11.6"</option>
+                                    <option value="13.3">13.3"</option>
+                                    <option value="13.4">13.4"</option>
+                                    <option value="13.5">13.5"</option>
+                                    <option value="13.6">13.6"</option>
+                                    <option value="14.0">14.0"</option>
+                                    <option value="14.1">14.1"</option>
+                                    <option value="14.2">14.2"</option>
+                                    <option value="15.0">15.0"</option>
+                                    <option value="15.3">15.3"</option>
+                                    <option value="15.6">15.6" (En yaygın)</option>
+                                    <option value="15.56">15.56"</option>
+                                    <option value="16.0">16.0"</option>
+                                    <option value="16.1">16.1"</option>
+                                    <option value="16.2">16.2"</option>
+                                    <option value="17.0">17.0"</option>
+                                    <option value="17.3">17.3"</option>
+                                    <option value="18.0">18.0"</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row-single">
+                            <div>
+                                <label for="GPU">Ekran Kartı</label>
+                                <select id="GPU" name="GPU">
+                                    <option value="">Seçiniz</option>
+                                    <option value="AMD Integrated">AMD Integrated</option>
+                                    <option value="AMD Radeon">AMD Radeon</option>
+                                    <option value="AMD Radeon AMD">AMD Radeon AMD</option>
+                                    <option value="AMD Radeon Graphics">AMD Radeon Graphics</option>
+                                    <option value="AMD Radeon Radeon Graphics">AMD Radeon Radeon Graphics</option>
+                                    <option value="AMD Radeon Vega 6">AMD Radeon Vega 6</option>
+                                    <option value="AMD Radeon Vega 7">AMD Radeon Vega 7</option>
+                                    <option value="AMD Radeon Vega 8">AMD Radeon Vega 8</option>
+                                    <option value="AMD Radeon Vega 9">AMD Radeon Vega 9</option>
+                                    <option value="AMD Radeon 610M">AMD Radeon 610M</option>
+                                    <option value="AMD Radeon 780M">AMD Radeon 780M</option>
+                                    <option value="AMD Radeon RX 5600M">AMD Radeon RX 5600M</option>
+                                    <option value="AMD Radeon RX 6500M">AMD Radeon RX 6500M</option>
+                                    <option value="AMD Radeon RX 6550M">AMD Radeon RX 6550M</option>
+                                    <option value="AMD Radeon RX 6600M">AMD Radeon RX 6600M</option>
+                                    <option value="AMD Radeon RX 6650M">AMD Radeon RX 6650M</option>
+                                    <option value="Apple M1 Integrated">Apple M1 Integrated</option>
+                                    <option value="Apple M2 GPU">Apple M2 GPU</option>
+                                    <option value="Intel Graphics">Intel Graphics</option>
+                                    <option value="Intel HD">Intel HD</option>
+                                    <option value="Intel HD Graphics">Intel HD Graphics</option>
+                                    <option value="Intel Integrated">Intel Integrated</option>
+                                    <option value="Intel Integrated Intel UHD">Intel Integrated Intel UHD</option>
+                                    <option value="Intel Integrated UHD">Intel Integrated UHD</option>
+                                    <option value="Intel Iris Plus">Intel Iris Plus</option>
+                                    <option value="Intel Iris Xe">Intel Iris Xe</option>
+                                    <option value="Intel Iris Xe Graphics">Intel Iris Xe Graphics</option>
+                                    <option value="Intel UHD Graphics">Intel UHD Graphics</option>
+                                    <option value="Intel Arc A350M">Intel Arc A350M</option>
+                                    <option value="NVIDIA GeForce MX130">NVIDIA GeForce MX130</option>
+                                    <option value="NVIDIA GeForce MX250">NVIDIA GeForce MX250</option>
+                                    <option value="NVIDIA GeForce MX350">NVIDIA GeForce MX350</option>
+                                    <option value="NVIDIA GeForce MX450">NVIDIA GeForce MX450</option>
+                                    <option value="NVIDIA GeForce MX570">NVIDIA GeForce MX570</option>
+                                    <option value="NVIDIA GeForce GTX 1050">NVIDIA GeForce GTX 1050</option>
+                                    <option value="NVIDIA GeForce GTX 1650">NVIDIA GeForce GTX 1650</option>
+                                    <option value="NVIDIA GeForce GTX 1660">NVIDIA GeForce GTX 1660</option>
+                                    <option value="NVIDIA GeForce RTX 2050">NVIDIA GeForce RTX 2050</option>
+                                    <option value="NVIDIA GeForce RTX 2060">NVIDIA GeForce RTX 2060</option>
+                                    <option value="NVIDIA GeForce RTX 2070">NVIDIA GeForce RTX 2070</option>
+                                    <option value="NVIDIA GeForce RTX 2080">NVIDIA GeForce RTX 2080</option>
+                                    <option value="NVIDIA GeForce RTX 3050">NVIDIA GeForce RTX 3050</option>
+                                    <option value="NVIDIA GeForce RTX 3050 Ti">NVIDIA GeForce RTX 3050 Ti</option>
+                                    <option value="NVIDIA GeForce RTX 3060">NVIDIA GeForce RTX 3060</option>
+                                    <option value="NVIDIA GeForce RTX 3070">NVIDIA GeForce RTX 3070</option>
+                                    <option value="NVIDIA GeForce RTX 3070 Ti">NVIDIA GeForce RTX 3070 Ti</option>
+                                    <option value="NVIDIA GeForce RTX 3080">NVIDIA GeForce RTX 3080</option>
+                                    <option value="NVIDIA GeForce RTX 3080 Ti">NVIDIA GeForce RTX 3080 Ti</option>
+                                    <option value="NVIDIA GeForce RTX 4050">NVIDIA GeForce RTX 4050</option>
+                                    <option value="NVIDIA GeForce RTX 4060">NVIDIA GeForce RTX 4060</option>
+                                    <option value="NVIDIA GeForce RTX 4070">NVIDIA GeForce RTX 4070</option>
+                                    <option value="NVIDIA GeForce RTX 4080">NVIDIA GeForce RTX 4080</option>
+                                    <option value="NVIDIA GeForce RTX 4090">NVIDIA GeForce RTX 4090</option>
+                                    <option value="NVIDIA RTX A500">NVIDIA RTX A500</option>
+                                    <option value="NVIDIA RTX A1000">NVIDIA RTX A1000</option>
+                                    <option value="NVIDIA RTX A2000">NVIDIA RTX A2000</option>
+                                    <option value="NVIDIA RTX 3000 Ada">NVIDIA RTX 3000 Ada</option>
+                                    <option value="NVIDIA Quadro T600">NVIDIA Quadro T600</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label for="OS">İşletim Sistemi</label>
+                                <select id="OS" name="OS">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Android 11 OS">Android 11</option>
+                                    <option value="Chrome OS">Chrome OS</option>
+                                    <option value="DOS OS">DOS</option>
+                                    <option value="DOS 3.0 OS">DOS 3.0</option>
+                                    <option value="Linux">Linux</option>
+                                    <option value="Mac OS">macOS</option>
+                                    <option value="Mac Catalina OS">Mac Catalina</option>
+                                    <option value="Mac High Sierra OS">Mac High Sierra</option>
+                                    <option value="Ubuntu OS">Ubuntu</option>
+                                    <option value="Windows 10 OS">Windows 10</option>
+                                    <option value="Windows 11 OS">Windows 11</option>
+                                    <option value="Windows OS">Windows</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="warranty">Garanti (Yıl)</label>
+                                <select id="warranty" name="warranty">
+                                    <option value="">Seçiniz</option>
+                                    <option value="0">0 Yıl</option>
+                                    <option value="1">1 Yıl</option>
+                                    <option value="2">2 Yıl</option>
+                                    <option value="3">3 Yıl</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="predict-btn">
+                        💰 Fiyat Tahmini Yap
+                    </button>
+                </form>
+            </div>
+
+            <div class="results-section">
+                <h2>📊 Sonuçlar</h2>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Fiyat hesaplanıyor...</p>
+                </div>
+
+                <div id="results" style="display: none;">
+                    <div class="price-result">
+                        <h3>Tahmini Fiyat</h3>
+                        <div id="predictedPrice" class="price-value">-</div>
+                    </div>
+
+                    <div class="suggestions">
+                        <h3 style="margin-bottom: 15px; color: #333;">🔍 Benzer Laptop Önerileri</h3>
+                        <div id="suggestionsList"></div>
+                    </div>
+                </div>
+
+                <div id="error" class="error" style="display: none;"></div>
+
+                <div id="initial-message" class="info-text">
+                    <strong>🚀 Başlamak için:</strong><br>
+                    • Sol taraftaki formu doldurun<br>
+                    • Bilmediğiniz alanları boş bırakabilirsiniz<br>
+                    • "Fiyat Tahmini Yap" butonuna tıklayın<br>
+                    • Anlık sonuçları burada görün!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('laptopForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // UI durumlarını güncelle
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('initial-message').style.display = 'none';
+            
+            // Form verilerini topla
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success) {
+                    // Fiyatı göster
+                    document.getElementById('predictedPrice').textContent = 
+                        new Intl.NumberFormat('tr-TR', {
+                            style: 'currency',
+                            currency: 'TRY'
+                        }).format(result.predicted_price);
+                    
+                    // Önerileri göster
+                    const suggestionsList = document.getElementById('suggestionsList');
+                    suggestionsList.innerHTML = '';
+                    
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        result.suggestions.forEach(laptop => {
+                            const card = document.createElement('div');
+                            card.className = 'suggestion-card';
+                            
+                            card.innerHTML = `
+                                <div class="suggestion-title">${laptop.name || 'Laptop'} - ${laptop.brand}</div>
+                                <div class="suggestion-specs">
+                                    <span><strong>Fiyat:</strong> ${new Intl.NumberFormat('tr-TR', {
+                                        style: 'currency',
+                                        currency: 'TRY'
+                                    }).format(laptop.price)}</span>
+                                    <span><strong>CPU:</strong> ${laptop.CPU || 'N/A'}</span>
+                                    <span><strong>RAM:</strong> ${laptop.Ram || 'N/A'} GB</span>
+                                    <span><strong>Depolama:</strong> ${laptop.ROM || 'N/A'} GB</span>
+                                    <span><strong>Puan:</strong> ${laptop.spec_rating ? laptop.spec_rating.toFixed(1) : 'N/A'}/100</span>
+                                </div>
+                            `;
+                            
+                            suggestionsList.appendChild(card);
+                        });
+                    } else {
+                        suggestionsList.innerHTML = '<p style="text-align: center; color: #666;">Şu anda öneri bulunmuyor.</p>';
+                    }
+                    
+                    document.getElementById('results').style.display = 'block';
+                } else {
+                    document.getElementById('error').textContent = 
+                        'Bir hata oluştu: ' + (result.error || 'Bilinmeyen hata');
+                    document.getElementById('error').style.display = 'block';
+                }
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 
+                    'Bağlantı hatası: ' + error.message;
+                document.getElementById('error').style.display = 'block';
+            }
+        });
+
+        // Form alanlarına odaklanma efekti
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+                this.parentElement.style.transition = 'transform 0.3s ease';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
